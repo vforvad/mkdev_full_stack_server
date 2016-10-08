@@ -161,8 +161,6 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
-    tainbox (1.2.0)
-      activesupport
     thor (0.19.1)
     thread_safe (0.3.5)
     tzinfo (1.2.2)
@@ -171,9 +169,6 @@ GEM
     websocket-driver (0.6.4)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.2)
-    with_advisory_lock (3.0.0)
-      activerecord (>= 3.2)
-      thread_safe
 
 PLATFORMS
   ruby
@@ -194,9 +189,7 @@ DEPENDENCIES
   rubocop
   spring
   spring-watcher-listen (~> 2.0.0)
-  tainbox
   tzinfo-data
-  with_advisory_lock
 
 BUNDLED WITH
    1.12.5

@@ -6,8 +6,6 @@ gem 'pg', '~> 0.18'
 gem 'puma', '~> 3.0'
 gem 'bcrypt', '~> 3.1.7'
 gem 'rack-cors'
-gem 'tainbox'
-gem 'with_advisory_lock'
 
 group :development, :test do
   gem 'pry-rails'

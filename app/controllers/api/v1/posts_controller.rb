@@ -8,8 +8,8 @@ class Api::V1::PostsController < Api::ApiController
   end
 
   def create
-    form = Form::Post.new(Post.new, params[:post])
-    if form.submit
+    post = Post.new(post_params)
+    if post.save
       render json: form, serializer: PostSerializer
     else
       render json: { errors: form.errors }, status: :unprocessable_entity
@@ -17,8 +17,7 @@ class Api::V1::PostsController < Api::ApiController
   end
 
   def update
-    form = Form::Post.new(@post, params[:post])
-    if form.submit
+    if @post.update(post_params)
       render json: form, serializer: PostSerializer
     else
       render json: { errors: form.errors }, status: :unprocessable_entity
@@ -37,5 +36,9 @@ class Api::V1::PostsController < Api::ApiController
 
   def find_post
     @post = Post.find(params[:id])
+  end
+
+  def post_params
+    params.require(:post).permit(:title, :username, :body)
   end
 end
