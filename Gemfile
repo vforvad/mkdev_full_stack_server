@@ -11,6 +11,8 @@ gem 'with_advisory_lock'
 group :development, :test do
   gem 'pry-rails'
   gem 'byebug', platform: :mri
+  gem 'rspec-rails', '~> 3.5'
+  gem 'factory_girl_rails'
 end
 
 group :development do

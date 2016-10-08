@@ -47,6 +47,11 @@ GEM
     database_cleaner (1.0.1)
     diff-lcs (1.2.5)
     erubis (2.7.0)
+    factory_girl (4.7.0)
+      activesupport (>= 3.0.0)
+    factory_girl_rails (4.7.0)
+      factory_girl (~> 4.7.0)
+      railties (>= 3.0.0)
     ffi (1.9.14)
     globalid (0.3.7)
       activesupport (>= 4.1.0)
@@ -122,6 +127,14 @@ GEM
     rspec-mocks (3.5.0)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.5.0)
+    rspec-rails (3.5.2)
+      actionpack (>= 3.0)
+      activesupport (>= 3.0)
+      railties (>= 3.0)
+      rspec-core (~> 3.5.0)
+      rspec-expectations (~> 3.5.0)
+      rspec-mocks (~> 3.5.0)
+      rspec-support (~> 3.5.0)
     rspec-support (3.5.0)
     slop (3.6.0)
     spring (2.0.0)
@@ -156,6 +169,7 @@ DEPENDENCIES
   bcrypt (~> 3.1.7)
   byebug
   database_cleaner (~> 1.0.1)
+  factory_girl_rails
   json_spec
   listen (~> 3.0.5)
   pg (~> 0.18)
@@ -163,6 +177,7 @@ DEPENDENCIES
   puma (~> 3.0)
   rack-cors
   rails (~> 5.0.0)
+  rspec-rails (~> 3.5)
   spring
   spring-watcher-listen (~> 2.0.0)
   tainbox
