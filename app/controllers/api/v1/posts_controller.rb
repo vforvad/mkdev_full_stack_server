@@ -10,17 +10,17 @@ class Api::V1::PostsController < Api::ApiController
   def create
     post = Post.new(post_params)
     if post.save
-      render json: form, serializer: PostSerializer
+      render json: post, serializer: PostSerializer
     else
-      render json: { errors: form.errors }, status: :unprocessable_entity
+      render json: { errors: post.errors }, status: :unprocessable_entity
     end
   end
 
   def update
     if @post.update(post_params)
-      render json: form, serializer: PostSerializer
+      render json: @post, serializer: PostSerializer
     else
-      render json: { errors: form.errors }, status: :unprocessable_entity
+      render json: { errors: @post.errors }, status: :unprocessable_entity
     end
   end
 

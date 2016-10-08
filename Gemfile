@@ -6,6 +6,7 @@ gem 'pg', '~> 0.18'
 gem 'puma', '~> 3.0'
 gem 'bcrypt', '~> 3.1.7'
 gem 'rack-cors'
+gem 'active_model_serializers'
 
 group :development, :test do
   gem 'pry-rails'
