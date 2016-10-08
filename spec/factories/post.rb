@@ -3,6 +3,6 @@ FactoryGirl.define do
   factory :post do
     username 'Name'
     title 'Title'
-    bod 'Body'
+    body 'Body'
   end
 end
