@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/vforvad/mkdev_full_stack_server.svg?branch=master)](https://travis-ci.org/vforvad/mkdev_full_stack_server)
+
 # README
 
 This README would normally document whatever steps are necessary to get the
