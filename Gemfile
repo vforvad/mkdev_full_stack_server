@@ -7,12 +7,14 @@ gem 'puma', '~> 3.0'
 gem 'bcrypt', '~> 3.1.7'
 gem 'rack-cors'
 gem 'active_model_serializers'
+gem 'rack-cors', require: 'rack/cors'
 
 group :development, :test do
   gem 'pry-rails'
   gem 'byebug', platform: :mri
   gem 'rspec-rails', '~> 3.5'
   gem 'factory_girl_rails'
+  gem 'pry-rails'
 end
 
 group :development do
