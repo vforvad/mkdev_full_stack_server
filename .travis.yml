@@ -11,5 +11,6 @@ before_install:
   - gem install mime-types -v 2.6.2
 before_script:
   - cp config/database.travis.yml config/database.yml
+  - cp config/local_env.travis.yml config/local_env.yml
   - bundle exec rake db:drop db:create db:migrate RAILS_ENV=test
 script: "bundle exec rspec spec"

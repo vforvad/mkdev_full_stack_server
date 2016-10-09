@@ -44,10 +44,9 @@ describe Api::V1::PostsController do
       context 'success response' do
         before { post :create, params: { post: post_params } }
 
-        %w(id title body username).each do |attr|
-          it "success response contains #{attr}" do
-            expect(JSON.parse(response.body)['post']).to have_key(attr)
-          end
+        it 'jsons are equal' do
+          expect(response.body).to be_json_eql(Post.last.to_json)
+            .excluding('created_at', 'updated_at').at_path('post')
         end
       end
     end
@@ -85,10 +84,9 @@ describe Api::V1::PostsController do
           post_info.reload
         end
 
-        %w(id title body username).each do |attr|
-          it "success response contains #{attr}" do
-            expect(JSON.parse(response.body)['post']).to have_key(attr)
-          end
+        it 'jsons are equal' do
+          expect(response.body).to be_json_eql(Post.last.to_json)
+            .excluding('created_at', 'updated_at').at_path('post')
         end
       end
     end
