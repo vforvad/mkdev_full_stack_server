@@ -12,21 +12,24 @@ describe Api::V1::PostsController do
     }
   end
 
+  def post_info_attrs
+    {
+      id: post_info.id,
+      title: post_info.title,
+      body: post_info.body,
+      username: post_info.username
+    }.stringify_keys
+  end
+
   describe 'GET #index' do
     it 'loads posts list' do
       get :index
       expect(JSON.parse(response.body)).to have_key('posts')
     end
 
-    context 'response' do
-      before { get :index }
-
-      %w(id title body username).each do |attr|
-        it "success response contains #{attr}" do
-          expect(response.body).to be_json_eql(post_info.send(attr.to_sym).to_json)
-            .at_path("posts/0/#{attr}")
-        end
-      end
+    it 'return list of posts' do
+      get :index
+      expect(JSON.parse(response.body)['posts']).to include(post_info_attrs)
     end
   end
 
