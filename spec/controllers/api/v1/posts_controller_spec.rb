@@ -46,8 +46,7 @@ describe Api::V1::PostsController do
 
         %w(id title body username).each do |attr|
           it "success response contains #{attr}" do
-            expect(response.body).to be_json_eql(Post.last.send(attr.to_sym).to_json)
-              .at_path("post/#{attr}")
+            expect(JSON.parse(response.body)['post']).to have_key(attr)
           end
         end
       end
@@ -88,8 +87,7 @@ describe Api::V1::PostsController do
 
         %w(id title body username).each do |attr|
           it "success response contains #{attr}" do
-            expect(response.body).to be_json_eql(post_info.send(attr.to_sym).to_json)
-              .at_path("post/#{attr}")
+            expect(JSON.parse(response.body)['post']).to have_key(attr)
           end
         end
       end
