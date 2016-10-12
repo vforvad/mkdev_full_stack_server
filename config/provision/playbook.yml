@@ -1,11 +1,15 @@
 ---
 - hosts: 'all'
-  remote_user: 'root'
+  remote_user: 'ec2-user'
+  become: true
+  become_user: 'root'
+  become_method: 'sudo'
+  # sudo: true
 
   # В данном блоке объявляются переменные, которые будут использоваться в playbook и конфигах, представленных выше
   vars:
     # Версия ruby
-    ruby_version: '2.2.4'
+    ruby_version: '2.3.0'
     # Пользователь, от лица которого будет происходит деплой
     user: 'deploy'
     # Домашняя директория
@@ -21,30 +25,48 @@
   tasks:
     # Обновление кеша и установка необходимых пакетов, всего программного обеспечения,
     # необходимого для работы нашего сервера
-    - name: 'apt | update'
-      action: 'apt update_cache=yes'
+    - name: 'Create nginx service'
+      copy: src=configs/nginx.service dest=/etc/yum.repos.d/nginx.repo
 
-    - name: 'apt | install dependencies'
-      action: 'apt pkg={{ item }}'
+    - name: 'Update red hat package loader'
+      # file: path=/etc/yum/pluginconf.d/rhui-lb.conf mode=0777
+      lineinfile: name=/etc/yum/pluginconf.d/rhui-lb.conf regexp=enabled= line="enabled=0"
+
+    - name: 'Upgrade all packages'
+      yum: name=* state=latest
+
+    - name: 'Install yum-utils'
+      raw: yum -y install yum-utils
+
+    - name: 'install dependencies'
+      shell: yum -y install {{ item }}
+      ignore_errors: yes
       # with_items - это обычный цикл в Ansible, он возьмёт и прогонит все его элементы через action
       with_items:
-        - 'build-essential'
-        - 'libssl-dev'
-        - 'libyaml-dev'
-        - 'libreadline6-dev'
-        - 'zlib1g-dev'
-        - 'libcurl4-openssl-dev'
         - 'git'
-        - 'nginx'
-        - 'redis-server'
-        - 'postgresql'
+        - 'zlib'
+        - 'zlib-devel'
+        - 'gcc-c++'
+        - 'patch'
+        - 'readline'
+        - 'readline-devel'
+        - 'libffi-devel'
+        - 'openssl-devel'
+        - 'make'
+        - 'bzip2'
+        - 'autoconf'
+        - 'automake'
+        - 'libtool'
+        - 'bison'
+        - 'curl'
+        - 'bzip2'
+        - 'postgresql-server'
         - 'postgresql-contrib'
-        - 'libpq-dev'
-        - 'imagemagick'
-        - 'libmagickwand-dev'
-        - 'nodejs'
-        - 'htop'
+        - 'postgresql-devel'
+        - 'nginx'
 
+    - name: 'Add nginx to autoload'
+      shell: 'chkconfig nginx on'
     # Создаём нашего пользователя deploy, копируем авторизационный ключ,
     # а так же публичный и приватный ssh ключи
     - name: 'account | create'
@@ -63,7 +85,9 @@
 
     # Устанавливаем ruby-build, rbenv, bundler (шаги взяты из инструкции к установке rbenv)
     - name: 'rbenv | clone repo'
-      git: 'repo=git://github.com/sstephenson/rbenv.git dest={{ rbenv_root }} accept_hostkey=yes'
+      git: 'repo=git://github.com/sstephenson/rbenv.git dest={{ rbenv_root }}'
+
+    - debug: msg="RBENV ROOT is {{ rbenv_root }}"
 
     - name: 'rbenv | check ruby-build installed'
       command: 'test -x {{ rbenv_root }}/plugins/ruby-build'
@@ -73,15 +97,21 @@
       ignore_errors: yes
 
     - name: 'rbenv | add bin to path'
-      shell: echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> {{ home }}/.bashrc
+      shell: echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
       when: 'plugin_installed|failed'
 
+    - debug: msg="HOME is {{ home }}"
+
     - name: 'rbenv | init'
-      shell: echo 'eval "$(rbenv init -)"' >> {{ home }}/.bashrc
+      shell: echo 'eval "$(rbenv init -)"' >> ~/.bashrc
       when: 'plugin_installed|failed'
 
     - name: 'rbenv | clone ruby-build repo'
-      git: 'repo=git://github.com/sstephenson/ruby-build.git dest={{ rbenv_root }}/plugins/ruby-build accept_hostkey=yes'
+      git: 'repo=git://github.com/sstephenson/ruby-build.git dest={{ rbenv_root }}/plugins/ruby-build'
+      when: 'plugin_installed|failed'
+
+    - name: 'ruby-build | connect'
+      shell: source {{home}}/.bashrc
       when: 'plugin_installed|failed'
 
     - name: 'rbenv | check ruby {{ ruby_version }} installed'
@@ -100,27 +130,36 @@
     - name: 'rbenv | rehash'
       shell: 'RBENV_ROOT={{ rbenv_root }} PATH="$RBENV_ROOT/bin:$PATH" rbenv rehash'
       when: 'ruby_installed|failed'
-
-    - name: 'rbenv | create .gemrc'
-      lineinfile: 'dest={{ home }}/.gemrc owner={{ user }} group={{ user }} mode=0644 line="gem: --no-ri --no-rdoc" create=yes'
-      when: 'ruby_installed|failed'
-
+    #
+    # - name: 'rbenv | create .gemrc'
+    #   lineinfile: 'dest={{ home }}/.gemrc owner={{ user }} group={{ user }} mode=0644 line="gem: --no-ri --no-rdoc" create=yes'
+    #   when: 'ruby_installed|failed'
+    #
     - name: 'ruby | install bundler'
       shell: 'RBENV_ROOT={{ rbenv_root }} PATH="$RBENV_ROOT/bin:$PATH" rbenv exec gem install bundler'
       when: 'ruby_installed|failed'
-
+    #
     - name: 'rbenv | change owner'
       shell: 'chown -R {{ user }}:{{ user }} {{ rbenv_root }}'
       when: 'ruby_installed|failed'
+    #
+    # # Устанавливаем posgresql, создаём пользователя, копируем конфиги и создаём конечную базу данных
+    # - name: 'postgresql | initdb'
+    #   shell: 'postgresql-setup initdb'
 
-    # Устанавливаем posgresql, создаём пользователя, копируем конфиги и создаём конечную базу данных
+    - name: 'postgresql | start service'
+      shell: 'systemctl start postgresql'
+
+    - name: 'postgresql | enable service'
+      shell: 'systemctl enable postgresql'
+
     - name: 'postgresql | check user'
       shell: 'psql -U postgres -c "\copyright"'
       register: 'postgres_login'
       ignore_errors: yes
 
     - name: 'postgresql | set auth type'
-      copy: 'src=configs/pg_hba.conf dest=/etc/postgresql/9.3/main/pg_hba.conf owner=postgres group=postgres mode=0644'
+      copy: 'src=configs/pg_hba.conf dest=/var/lib/pgsql/data/pg_hba.conf owner=postgres group=postgres mode=0644'
       when: 'postgres_login|failed'
 
     - name: 'postgresql | restart service'
@@ -132,17 +171,20 @@
       when: 'postgres_login|failed'
 
     - name: 'postgresql | copy database.yml'
-    # Модуль template позволяет нам не просто копировать файл из А в Б, но и переменные, которые будут автоматически подставляться внутри конфигов
+      # Модуль template позволяет нам не просто копировать файл из А в Б, но и переменные, которые будут автоматически подставляться внутри конфигов
       template: 'src=configs/database.yml dest={{ application }}/shared/config/database.yml owner={{ user }} group={{ user }} mode=0644'
       when: 'postgres_login|failed'
-
+    #
     - name: 'postgresql | create database'
       shell: 'createdb -U postgres -O postgres -E UTF8 -l en_US.UTF-8 {{ name }}_production'
       when: 'postgres_login|failed'
-
+    #
     # Rails setup | копируем settings.yml с нашими настройками
     - name: 'rails | copy settings.yml'
       copy: 'src=configs/settings.yml dest={{ application }}/shared/config/settings.yml owner={{ user }} group={{ user }} mode=0644'
+
+    - name: 'Create nginx folders'
+      shell: 'mkdir -p /etc/nginx/sites-available && mkdir -p /etc/nginx/sites-enabled'
 
     # Установка и настройка веб сервера nginx
     - name: 'nginx | check config'
