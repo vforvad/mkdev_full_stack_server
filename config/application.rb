@@ -10,7 +10,7 @@ require 'action_controller/railtie'
 require 'action_mailer/railtie'
 require 'action_view/railtie'
 require 'action_cable/engine'
-# require "sprockets/railtie"
+require 'sprockets/railtie'
 require 'rails/test_unit/railtie'
 
 # Require the gems listed in Gemfile, including any gems
@@ -28,11 +28,11 @@ module Server
       end if File.exist?(env_file)
     end
 
-    # config.middleware.insert_before 0, Rack::Cors do
-    #   allow do
-    #     origins ENV['CORS_HOST']
-    #     resource '*', headers: :any, methods: [:get, :post, :put, :patch, :delete]
-    #   end
-    # end
+    config.middleware.insert_before 0, Rack::Cors do
+      allow do
+        origins ENV['CORS_HOST']
+        resource '*', headers: :any, methods: [:get, :post, :put, :patch, :delete]
+      end
+    end
   end
 end
