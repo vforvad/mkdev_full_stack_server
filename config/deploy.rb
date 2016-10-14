@@ -9,7 +9,7 @@ set :deploy_to, '/home/deploy/applications/mkdev_full_stack'
 
 set :ssh_options, forward_agent: true, user: 'deploy', keys: ["#{ENV['HOME']}/.ssh/basic.pem"]
 set :log_level, :info
-set :linked_files, %w(config/database.yml config/settings.yml)
+set :linked_files, %w(config/database.yml config/settings.yml config/local_env.yml)
 set :linked_dirs, %w(bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public/uploads)
 
 set :rbenv_type, :user
