@@ -3,13 +3,12 @@
 require 'capistrano/setup'
 require 'capistrano/deploy'
 require 'capistrano/bundler'
-require 'capistrano/rails'
+require 'capistrano/rails/migrations'
 require 'capistrano/rbenv'
 # require 'capistrano/chruby'
 
 require 'capistrano/puma'
-require 'capistrano/rails/assets'
-require 'capistrano/rails/migrations'
+
 # Include default deployment tasks
 
 # Include tasks from other gems included in your Gemfile
