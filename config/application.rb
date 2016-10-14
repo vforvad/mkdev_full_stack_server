@@ -28,11 +28,11 @@ module Server
       end if File.exist?(env_file)
     end
 
-    config.middleware.insert_before 0, Rack::Cors do
-      allow do
-        origins ENV['CORS_HOST']
-        resource '*', headers: :any, methods: [:get, :post, :put, :patch, :delete]
-      end
-    end
+    # config.middleware.insert_before 0, Rack::Cors do
+    #   allow do
+    #     origins ENV['CORS_HOST']
+    #     resource '*', headers: :any, methods: [:get, :post, :put, :patch, :delete]
+    #   end
+    # end
   end
 end
